@@ -30,3 +30,13 @@ gdown --id 1TnR-r6TZvlbrTefXBTJSJbUyuNCXKf57 -O dataset.tar.xz
 mkdir -p data && tar -xvf dataset.tar.xz -C data/
 rm dataset.tar.xz
 ```
+
+### Train Lora Diffusion
+
+To train the Lora diffusion model, run the following commands:
+
+```bash
+chmod +x train_lora.sh
+./train_lora.sh
+```
+
