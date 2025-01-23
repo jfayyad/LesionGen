@@ -1,11 +1,11 @@
 #!/bin/bash
 export MODEL_NAME="CompVis/stable-diffusion-v1-4"
-export TRAIN_DIR="/home/jfayyad/Python_Projects/LesionGen/data/training_dataset"
-export OUTPUT_DIR="Lora"
+export TRAIN_DIR="data/training_dataset"
+export OUTPUT_DIR="Lora/weights"
 
 mkdir -p $OUTPUT_DIR
 
-accelerate launch /home/jfayyad/Python_Projects/LesionGen/external/diffusers/examples/text_to_image/train_text_to_image_lora.py \
+accelerate launch external/diffusers/examples/text_to_image/train_text_to_image_lora.py \
 --pretrained_model_name_or_path=$MODEL_NAME \
 --train_data_dir=$TRAIN_DIR \
 --resolution=256 --center_crop --random_flip \
