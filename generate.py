@@ -25,8 +25,8 @@ def generate_images(condition, mode, output_dir, num_images):
             f"{condition} large size on a light skin tone",
             f"{condition} medium size on a medium skin tone"
         ]
-        guidance_scales = [5.0, 7.5, 10.0]
-        num_inference_steps_list = [30, 50, 70]
+        guidance_scales = [3.0, 5.0, 7.5, 10.0]
+        num_inference_steps_list = [30, 50, 70, 100]
 
         for i in range(num_images):
             prompt = random.choice(prompts)
