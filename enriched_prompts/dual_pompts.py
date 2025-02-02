@@ -41,8 +41,10 @@ def truncate_clip_tokenizer(prompt_clip, clip_tokenizer, max_length=75, test_tok
 def generate_description_clip(t5_prompt, image_name,):
 
     prompt = """Convert the below response (including the category names) \
-to a list of words or phrases for a image generation prompt, \
-separated by comma when appropriate. Maximum number of words is 60. Output the list only."""
+to a list of words or phrases for a image generation prompt. \
+Separated the phrases by commas only if necessary. \
+For a lesion type with multiple subtypes, select the most fitting subtype in the image description. \
+Maximum number of words is 60. Output the list only."""
 
     try:
         response = client.chat.completions.create(
@@ -54,7 +56,8 @@ separated by comma when appropriate. Maximum number of words is 60. Output the l
                     {"type": "text", "text": t5_prompt}
                 ]}
             ],
-            max_tokens=150
+            max_tokens=100,
+            temperature=1.0,
         )
         return response.choices[0].message.content.strip()
     except Exception as e:
@@ -78,17 +81,16 @@ def generate_description_t5(diagnosis, image_name, encoded_image, max_tokens=500
 
     lesion_type, age, gender, localization = diagnosis
     prompt = f"""\
-You are a medical expert specializing in dermatology. \
-I am providing you with an image of a skin lesion from the HAM10000 dataset. \
-You are provided the information that this lesion is a {lesion_type}, \
-and this comes from a {age} year old {gender} patient on their {localization}. \
-Now perform the visual description again with step-by-step reasoning with the information. \
-Use a schema with 11 entries to output your description: \
-patient info (age, gender, lesion type, localization), lesion color, lesion color variability (with description), \
-shape and shape variability (with description), size % with respect to the image, \
-border definition, texture, specific dermoscopic patterns, elevation, \
-the Fitzpatrick scale of the healthy skin tone around the lesion, \
-additional notable features. Write in clear medical language and do not include additional information. \
+You are provided with an image of a skin lesion from the HAM10000 dataset. \
+The lesion has been identified as a {lesion_type} from a {age}-year old {gender} patient on their {localization}. \
+Please analyze the image and generate a structured visual description, \
+and perform by step-by-step reasoning with the given information. \
+Use a schema with 12 entries to output your description: \
+Patient info (age, gender, lesion type, localization), Lesion color, Color variability detail, \
+Lesion shape, Shape variability detail, Size % with respect to the image, \
+Border definition, Lesion texture, Specific dermoscopic patterns, Lesion elevation, \
+Fitzpatrick scale of the healthy skin tone around the lesion, \
+and Additional notable features. Write in clear medical language and do not include additional information in your output. \
 Limit your response under 350 words.
 """
 
@@ -98,11 +100,12 @@ Limit your response under 350 words.
             messages=[
                 {"role": "system", "content": "You are a medical expert specializing in dermatology."},
                 {"role": "user", "content": [
+                    {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{encoded_image}"}},
                     {"type": "text", "text": prompt},
-                    {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{encoded_image}"}}
                 ]}
             ],
-            max_tokens=max_tokens
+            max_tokens=max_tokens,
+            temperature=1.0,
         )
         return response.choices[0].message.content.strip()
     except Exception as e:
