@@ -5,7 +5,13 @@ from PIL import Image
 import pandas as pd
 import io
 
-client = OpenAI(api_key='')
+# api_key = os.getenv("OPENAI_API_KEY")
+# if not api_key:
+#     raise ValueError("OpenAI API key is missing. Set the OPENAI_API_KEY environment variable.")
+
+
+client = OpenAI(api_key='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'
+)
 
 try:
     from transformers import T5Tokenizer, CLIPTokenizer
@@ -213,9 +219,13 @@ def process_images_clip_only(df, output_dir, test_mode=True):
 # process_images(image_folder='../zipped_classes/vasc', diagnosis="Vascular lesions", test_mode=False)
 
 df_subset = pd.read_csv('./HAM10000_metadata_subset.csv')
-process_images_from_HAM_csv_t5(df_subset, './data/training_dataset/',
-                            #    output_dir='./', 
-                               test_mode=False, 
+dataset_dir = '/home/jfayyad/Python_Projects/VLMs/Datasets/HAM/images'
+output_dir = './Description_outputs'
+os.makedirs(output_dir, exist_ok=True)
+
+process_images_from_HAM_csv_t5(df_subset, dataset_dir,
+                               output_dir, 
+                               test_mode=True, 
                                enable_clip_desc=True)
 
 # alternatively run the following to process images with T5 descriptions only
