@@ -4,6 +4,8 @@ import os
 from PIL import Image
 import pandas as pd
 import io
+from tqdm import tqdm
+import csv
 
 client = OpenAI(api_key='')
 
@@ -38,7 +40,7 @@ def truncate_clip_tokenizer(prompt_clip, clip_tokenizer, max_length=75, test_tok
         return prompt_clip, None
 
 
-def generate_description_clip(t5_prompt, image_name,):
+def generate_description_clip(t5_prompt, image_name, model = None):
 
     prompt = """Convert the below response (including the category names) \
 to a list of words or phrases for a image generation prompt. \
@@ -48,7 +50,7 @@ Maximum number of words is 60. Output the list only."""
 
     try:
         response = client.chat.completions.create(
-            model="gpt-4o",
+            model=model,
             messages=[
                 {"role": "system", "content": "You are a medical expert specializing in dermatology."},
                 {"role": "user", "content": [
@@ -65,7 +67,7 @@ Maximum number of words is 60. Output the list only."""
         return "Error generating description"
 
 
-def generate_description_t5(diagnosis, image_name, encoded_image, max_tokens=500):
+def generate_description_t5(diagnosis, image_name, encoded_image, max_tokens=500, model = None):
     """
     Generate a visual description of a skin lesion image using the T5 model.
 
@@ -78,12 +80,17 @@ def generate_description_t5(diagnosis, image_name, encoded_image, max_tokens=500
     Returns:
         str: The generated description.
     """
-
     lesion_type, age, gender, localization = diagnosis
+
+    if age is None:
+        age = "unknown"
+    if localization == "unknown":    
+        localization = "unknown area"
+
     prompt = f"""\
 You are provided with an image of a skin lesion from the HAM10000 dataset. \
 The lesion has been identified as a {lesion_type} from a {age}-year old {gender} patient on their {localization}. \
-Please analyze the image and generate a structured visual description, \
+Based on the image, please generate a structured visual description, \
 and perform by step-by-step reasoning with the given information. \
 Use a schema with 12 entries to output your description: \
 Patient info (age, gender, lesion type, localization), Lesion color, Color variability detail, \
@@ -91,12 +98,12 @@ Lesion shape, Shape variability detail, Size % with respect to the image, \
 Border definition, Lesion texture, Specific dermoscopic patterns, Lesion elevation, \
 Fitzpatrick scale of the healthy skin tone around the lesion, \
 and Additional notable features. Write in clear medical language and do not include additional information in your output. \
-Limit your response under 350 words.
+You response should be around 500 words.
 """
 
     try:
         response = client.chat.completions.create(
-            model="gpt-4o",
+            model=model,
             messages=[
                 {"role": "system", "content": "You are a medical expert specializing in dermatology."},
                 {"role": "user", "content": [
@@ -113,7 +120,7 @@ Limit your response under 350 words.
         return "Error generating description"
 
 
-def process_images_from_HAM_csv_t5(df, image_dir, output_dir = None, test_mode=True, enable_clip_desc=True):
+def process_images_from_HAM_csv_t5(df, image_dir, output_dir = None, test_mode=True, enable_clip_desc=True, model = None):
     """
     Process images from the HAM10000 dataset and generate descriptions for T5.
 
@@ -135,7 +142,9 @@ def process_images_from_HAM_csv_t5(df, image_dir, output_dir = None, test_mode=T
         'vasc' : "(VASC) vascular lesions (angiomas, angiokeratomas, pyogenic granulomas and hemorrhage"
     }
 
-    for idx, row in df.iterrows():
+    output_path = os.path.join(output_dir, "image_descriptions_qwen.csv")
+
+    for idx, row in tqdm(df[1000:].iterrows()):
         image_name = row["image_id"]
 
         image_path = os.path.join(image_dir, (row['image_id']+'.jpg'))
@@ -143,18 +152,23 @@ def process_images_from_HAM_csv_t5(df, image_dir, output_dir = None, test_mode=T
         with open(image_path, "rb") as image_file:
             encoded_image = base64.b64encode(image_file.read()).decode('utf-8')
 
+        try:
+            age = int(row['age'])
+        except ValueError:
+            age = None
+
         diagnosis = (
             lesion_type_dict[row['dx']],
-            int(row['age']),
+            age,
             row['sex'],
             row['localization']
         )
 
-        t5_desc = generate_description_t5(diagnosis, image_name, encoded_image, max_tokens=480)
+        t5_desc = generate_description_t5(diagnosis, image_name, encoded_image, max_tokens=480, model = model)
 
         if enable_clip_desc:
             # Generate the short 77 token CLIP description along with T5 description
-            clip_desc = generate_description_clip(t5_desc, image_name)
+            clip_desc = generate_description_clip(t5_desc, image_name, model = model)
             clip_desc, _ = truncate_clip_tokenizer(clip_desc, clip_tokenizer, max_length=77)
 
             data.append([image_name, t5_desc, clip_desc])
@@ -164,16 +178,17 @@ def process_images_from_HAM_csv_t5(df, image_dir, output_dir = None, test_mode=T
         if test_mode and idx >= 2:  
             break
 
-    if enable_clip_desc:
-        df = pd.DataFrame(data, columns=["Image Name", "T5 Description", "CLIP Description"])
-    else:
-        df = pd.DataFrame(data, columns=["Image Name", "Description"])
+        # Write to CSV line by line to prevent data loss
+        with open(output_path, 'a', newline='') as csvfile:
+            writer = csv.writer(csvfile)
+            if idx == 0:
+                if enable_clip_desc:
+                    writer.writerow(["Image Name", "T5 Description", "CLIP Description"])
+                else:
+                    writer.writerow(["Image Name", "Description"])
+            writer.writerow(data[-1])
+            data = []  # Clear the data list to free memory
 
-    # Save
-    if not output_dir:
-        output_dir = image_dir
-    output_path = os.path.join(output_dir, "image_descriptions.csv")
-    df.to_csv(output_path, index=False)
     print(f"Descriptions saved to {output_path}")
 
 
@@ -188,7 +203,9 @@ def process_images_clip_only(df, output_dir, test_mode=True):
 
     data = []
 
-    for idx, row in df.iterrows():
+    output_path = os.path.join(output_dir, "image_descriptions_all.csv")
+
+    for idx, row in tqdm(df.iterrows()):
         image_name = row["Image Name"]
         t5_desc = row["Description"]
     
@@ -201,22 +218,32 @@ def process_images_clip_only(df, output_dir, test_mode=True):
         if test_mode and idx >= 2:  
             break
 
-    df = pd.DataFrame(data, columns=["Image Name", "CLIP Description"])
+         # df = pd.DataFrame(data, columns=["Image Name", "T5 Description", "CLIP Description"])
 
-    # Save
-    output_path = os.path.join(output_dir, "image_descriptions_clip.csv")
-    df.to_csv(output_path, index=False)
+        # Write to CSV line by line to prevent data loss
+        with open(output_path, 'a', newline='') as csvfile:
+            writer = csv.writer(csvfile)
+            if idx == 0:
+                writer.writerow(["Image Name", "T5 Description", "CLIP Description"])
+            writer.writerow(data[-1])
+            data = []  # Clear the data list to free memory
+
     print(f"CLIP Descriptions saved to {output_path}")
-
 
 # Run in test mode to process only one image
 # process_images(image_folder='../zipped_classes/vasc', diagnosis="Vascular lesions", test_mode=False)
 
 df_subset = pd.read_csv('./HAM10000_metadata_subset.csv')
-process_images_from_HAM_csv_t5(df_subset, './data/training_dataset/',
-                            #    output_dir='./', 
-                               test_mode=False, 
-                               enable_clip_desc=True)
+process_images_from_HAM_csv_t5(
+    df_subset,
+    './data/training_dataset/',
+    output_dir='./', 
+    test_mode=False,
+    enable_clip_desc=False,
+    # model = "ep-20250202120604-wwrv4"
+    # model = "gpt-4o"
+    model = "Qwen/Qwen2-VL-7B-Instruct-GPTQ-Int4"
+)
 
 # alternatively run the following to process images with T5 descriptions only
 # df_subset_clip = pd.read_csv('./image_descriptions.csv')
