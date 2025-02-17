@@ -57,7 +57,7 @@ chmod +x train_lora.sh
 #### Generate a Single Image
 
 ```bash
-python generate_images.py --condition "Melanoma" --mode single
+python generate.py --condition "Melanoma" --mode single
 ```
 
 Output:
