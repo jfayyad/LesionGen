@@ -5,7 +5,7 @@ import argparse
 from diffusers import StableDiffusionXLPipeline
 
 def generate_images(condition, mode, output_dir, num_images):
-    model_path = "/home/jfayyad/Python_Projects/VLMs/diffusers/examples/text_to_image/Lora_SDXL/checkpoint-301500"
+    model_path = "/home/jfayyad/Python_Projects/LesionGen/Lora/weights/checkpoint-301500"
     
     # Load the SDXL model
     pipe = StableDiffusionXLPipeline.from_pretrained(
@@ -27,7 +27,7 @@ def generate_images(condition, mode, output_dir, num_images):
         os.makedirs(single_output_dir, exist_ok=True)
 
         prompt = f"{condition} small size on a dark skin tone"
-        image = pipe(prompt, num_inference_steps=50, guidance_scale=7.5, added_cond_kwargs={}).images[0]
+        image = pipe(prompt, num_inference_steps=100, guidance_scale=7.5, added_cond_kwargs={}).images[0]
         image.save(os.path.join(single_output_dir, f"{condition}.png"))
 
     elif mode == "dataset":
