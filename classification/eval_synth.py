@@ -6,7 +6,7 @@ import os
 from torchvision import models
 import numpy as np
 
-img_dir = '/home/jfayyad/Python_Projects/VLMs/diffusers/examples/text_to_image/Future_samples_3'
+img_dir = '/home/jfayyad/Python_Projects/LesionGen/synth_dataset'
 test_loader = get_dataloader(img_dir=img_dir)
 
 model = models.vit_b_16(pretrained=True)

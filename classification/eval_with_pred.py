@@ -7,7 +7,7 @@ from torchvision import models
 import numpy as np
 import pandas as pd
 
-img_dir = '/home/jfayyad/Python_Projects/LesionGen/generated_images/dataset'
+img_dir = '/home/jfayyad/Python_Projects/LesionGen/LORA_NEW_DATASET/d7p/labels'
 test_loader = get_dataloader(img_dir=img_dir)
 
 model = models.vit_b_16(pretrained=True)

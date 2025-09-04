@@ -4,8 +4,7 @@ import random
 import argparse
 from diffusers import StableDiffusionPipeline
 
-def generate_images(condition, mode, output_dir, num_images):
-    model_path = 'Lora/weights/checkpoint-15000'
+def generate_images(condition, mode, output_dir, num_images, model_path='Lora/weights/checkpoint-15000'):
     pipe = StableDiffusionPipeline.from_pretrained("CompVis/stable-diffusion-v1-4", torch_dtype=torch.float16)
     pipe.unet.load_attn_procs(model_path)
     pipe.to("cuda")
@@ -41,6 +40,7 @@ if __name__ == "__main__":
     parser.add_argument("--mode", type=str, choices=["single", "dataset"], required=True)
     parser.add_argument("--output_dir", type=str, default="generated_images")
     parser.add_argument("--num_images", type=int, default=10)
+    parser.add_argument("--model_path", type=str, default="Lora/weights/checkpoint-15000", help="Path to LoRA model weights")
     args = parser.parse_args()
 
-    generate_images(args.condition, args.mode, args.output_dir, args.num_images)
+    generate_images(args.condition, args.mode, args.output_dir, args.num_images, args.model_path)

@@ -74,9 +74,11 @@ def get_dataloaders(dataset_name, batch_size=32, img_dir=None, transform=transfo
         return annotations
 
     if dataset_name == 'HAM':
-        train_csv_file = '/home/jfayyad/Python_Projects/VLMs/Datasets/HAM/splits/train.csv'
-        val_csv_file = '/home/jfayyad/Python_Projects/VLMs/Datasets/HAM/splits/val.csv'
-        test_csv_file = '/home/jfayyad/Python_Projects/VLMs/Datasets/HAM/splits/test.csv'
+        # Assume CSV files are in the same directory as the images
+        base_dir = os.path.dirname(img_dir) if img_dir else '.'
+        train_csv_file = os.path.join(base_dir, 'splits', 'train.csv')
+        val_csv_file = os.path.join(base_dir, 'splits', 'val.csv')
+        test_csv_file = os.path.join(base_dir, 'splits', 'test.csv')
 
         # Load, filter, and balance training data
         train_annotations = load_and_balance_data(train_csv_file, target_classes, augment_underrepresented= False)
@@ -88,9 +90,10 @@ def get_dataloaders(dataset_name, batch_size=32, img_dir=None, transform=transfo
             test_annotations = test_annotations[test_annotations['dx'].isin(target_classes)]
 
     elif dataset_name == 'DMF':
-        train_csv_file = 'Datasets/DMF/splits/train.csv'
-        val_csv_file = 'Datasets/DMF/splits/val.csv'
-        test_csv_file = 'Datasets/DMF/splits/test.csv'
+        base_dir = os.path.dirname(img_dir) if img_dir else '.'
+        train_csv_file = os.path.join(base_dir, 'splits', 'train.csv')
+        val_csv_file = os.path.join(base_dir, 'splits', 'val.csv')
+        test_csv_file = os.path.join(base_dir, 'splits', 'test.csv')
 
         train_annotations = load_and_balance_data(train_csv_file, target_classes, augment_underrepresented)
         val_annotations = pd.read_csv(val_csv_file)
