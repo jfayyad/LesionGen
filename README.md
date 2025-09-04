@@ -5,8 +5,7 @@
 
 Deep learning models for skin disease classification require large, diverse, and well-annotated datasets. However, such resources are often limited due to privacy concerns, high annotation costs, and insufficient demographic representation. While text-to-image diffusion probabilistic models (T2I-DPMs) offer promise for medical data synthesis, their use in dermatology remains underexplored, largely due to the scarcity of rich textual descriptions in existing skin image datasets. In this work, we introduce LesionGen, a clinically informed T2I-DPM framework for dermatology image synthesis. Unlike prior methods that rely on simplistic disease labels, LesionGen is trained on structured, concept-rich dermatological captions derived from expert annotations and pseudo-generated, concept-guided reports. By fine-tuning a pretrained diffusion model on these high-quality image-caption pairs, we enable the generation of realistic and diverse skin lesion images conditioned on meaningful dermatological descriptions. Our results demonstrate that models trained solely on our synthetic dataset achieve classification accuracy comparable to those trained on real images, with notable gains in worst-case subgroup performance.
 
-**Paper**: [LesionGen: A Concept-Guided Diffusion Model for Dermatology Image Synthesis](https://arxiv.org/abs/2507.23001)  
-**Accepted at**: MICCAI 2025 ISIC Workshop
+**Paper**: [MICCAI 2025 ISIC Workshop][LesionGen: A Concept-Guided Diffusion Model for Dermatology Image Synthesis]
 
 
 ## Requirements
