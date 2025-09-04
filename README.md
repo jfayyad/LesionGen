@@ -9,7 +9,7 @@ Deep learning models for skin disease classification require large, diverse, and
 **Accepted at**: MICCAI 2025 ISIC Workshop
 
 
-## 📋 Requirements
+## Requirements
 
 ### System Requirements
 - Python 3.8+
@@ -29,7 +29,7 @@ Key dependencies include:
 - `transformers`
 - `peft` for LoRA training
 
-## 🚀 Quick Start
+## Quick Start
 
 ### 1. Clone the Repository
 ```bash
@@ -95,7 +95,7 @@ python generate.py --condition "Melanoma" --mode single
 python generate.py --condition "Melanoma" --mode dataset --num_images 50
 ```
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 LesionGen/
@@ -117,7 +117,7 @@ LesionGen/
 └── requirements.txt      # Python dependencies
 ```
 
-## 🔧 Training Configuration
+## Training Configuration
 
 ### LoRA Training Parameters
 - **Learning Rate**: 5e-06
@@ -154,7 +154,7 @@ python generate.py --condition "Melanoma" --mode dataset --num_images 100 --outp
 - Vascular lesions
 - Actinic keratoses and intraepithelial carcinoma
 
-## 🧪 Classification
+## Classification
 
 Train and evaluate skin lesion classifiers:
 
@@ -169,7 +169,7 @@ python classifier.py --data_dir /path/to/dataset --epochs 20 --batch_size 64
 - Cross-validation support
 - Model checkpointing
 
-## 📊 Datasets
+## Datasets
 
 ### HAM10000
 - 10,015 dermatoscopic images
@@ -179,18 +179,15 @@ python classifier.py --data_dir /path/to/dataset --epochs 20 --batch_size 64
 - Additional dermatological dataset
 
 
-## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🙏 Acknowledgments
+## Acknowledgments
 
 - [Hugging Face Diffusers](https://github.com/huggingface/diffusers) for the training framework
 - [HAM10000 Dataset](https://www.nature.com/articles/sdata2018161) for dermatological images
 - [Stable Diffusion](https://stability.ai/blog/stable-diffusion-announcement) for the base model
 
 
-## 🔬 Citation
+## Citation
 
 If you use this work in your research, please cite:
 
@@ -203,5 +200,3 @@ If you use this work in your research, please cite:
   url={https://arxiv.org/abs/2507.23001}
 }
 ```
-
-**BibTeX**: [Download from arXiv](https://arxiv.org/abs/2507.23001)
