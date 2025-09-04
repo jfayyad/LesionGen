@@ -1,14 +1,7 @@
 # LesionGen: AI-Powered Skin Lesion Generation
 
-LesionGen is a comprehensive framework for generating synthetic skin lesion images using diffusion models. The project includes both full fine-tuning and LoRA (Low-Rank Adaptation) approaches for training Stable Diffusion models on dermatological datasets.
+Deep learning models for skin disease classification require large, diverse, and well-annotated datasets. However, such resources are often limited due to privacy concerns, high annotation costs, and insufficient demographic representation. While text-to-image diffusion probabilistic models (T2I-DPMs) offer promise for medical data synthesis, their use in dermatology remains underexplored, largely due to the scarcity of rich textual descriptions in existing skin image datasets. In this work, we introduce LesionGen, a clinically informed T2I-DPM framework for dermatology image synthesis. Unlike prior methods that rely on simplistic disease labels, LesionGen is trained on structured, concept-rich dermatological captions derived from expert annotations and pseudo-generated, concept-guided reports. By fine-tuning a pretrained diffusion model on these high-quality image-caption pairs, we enable the generation of realistic and diverse skin lesion images conditioned on meaningful dermatological descriptions. Our results demonstrate that models trained solely on our synthetic dataset achieve classification accuracy comparable to those trained on real images, with notable gains in worst-case subgroup performance.
 
-## 🎯 Features
-
-- **Full Model Fine-tuning**: Complete Stable Diffusion model training on skin lesion datasets
-- **LoRA Training**: Efficient fine-tuning using Low-Rank Adaptation
-- **Classification Pipeline**: Train and evaluate skin lesion classifiers
-- **Flexible Generation**: Generate single images or entire datasets
-- **Multiple Datasets**: Support for HAM10000 and D7P datasets
 
 ## 📋 Requirements
 
@@ -34,7 +27,7 @@ Key dependencies include:
 
 ### 1. Clone the Repository
 ```bash
-git clone https://github.com/yourusername/LesionGen.git
+git clone https://github.com/jfayyad/LesionGen.git
 cd LesionGen
 ```
 
@@ -62,17 +55,10 @@ cd ../..
    - Save as `metadata.csv` in the `data/ham10000/` folder
 
 #### D7P Dataset
-1. **Download the full D7P dataset** (contact the authors or check the original paper)
+1. **Download the full D7P dataset** [D7P Dataset](https://derm.cs.sfu.ca/Welcome.html)
 2. **Download the metadata file**:
    - **Metadata Link**: [D7P Metadata](https://drive.google.com/file/d/1_56PsBov6rI6_F9JfBf_2GKd8hQolA3Y/view?usp=sharing)
    - Save as `metadata.csv` in the `data/d7p/` folder
-
-#### Rename Metadata Files
-After downloading, use the helper script to rename metadata files:
-
-```bash
-python rename_metadata.py
-```
 
 **Note**: 
 - The full datasets with images need to be obtained from their original sources
@@ -141,7 +127,7 @@ LesionGen/
 - **EMA**: Enabled
 - **Mixed Precision**: FP16
 
-## 🎨 Generation Options
+## Generation Options
 
 ### Single Image Generation
 ```bash
