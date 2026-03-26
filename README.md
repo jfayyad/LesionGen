@@ -190,11 +190,12 @@ python classifier.py --data_dir /path/to/dataset --epochs 20 --batch_size 64
 If you use this work in your research, please cite:
 
 ```bibtex
-@article{fayyad2025lesiongen,
-  title={LesionGen: A Concept-Guided Diffusion Model for Dermatology Image Synthesis},
+@inproceedings{fayyad2025lesiongen,
+  title={LesionGen: A concept-guided diffusion model for dermatology image synthesis},
   author={Fayyad, Jamil and Bayasi, Nourhan and Yu, Ziyang and Najjaran, Homayoun},
-  journal={arXiv preprint arXiv:2507.23001},
+  booktitle={MICCAI Workshop on Deep Generative Models},
+  pages={3--12},
   year={2025},
-  url={https://arxiv.org/abs/2507.23001}
+  organization={Springer}
 }
 ```
